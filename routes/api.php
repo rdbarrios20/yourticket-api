@@ -19,4 +19,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+// Routes for the API resource
+// User routes
+Route::get('get-all-users',[UserController::class, 'index']);
+Route::get('get-user/{id}',[UserController::class, 'show']);
 Route::post('register-users',[UserController::class, 'store']);
+Route::put('update-user/{id}',[UserController::class, 'update']);
+// Route::delete('delete-user/{id}',[UserController::class, 'delete']);
+// Tiket routes
