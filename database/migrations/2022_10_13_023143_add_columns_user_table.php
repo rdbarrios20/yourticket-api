@@ -16,8 +16,6 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             $table->bigInteger('identification')->unique()->after('id');
             $table->string('surnames')->after('name');
-            $table->string('address')->unique()->after('surnames');
-            $table->bigInteger('phone_number')->after('address');
         });
     }
 
@@ -31,8 +29,6 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             $table->dropColumn('identification');
             $table->dropColumn('surnames');
-            $table->dropColumn('address');
-            $table->dropColumn('phone_number');
         });
     }
 };

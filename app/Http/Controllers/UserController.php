@@ -20,12 +20,10 @@ class UserController extends Controller
             'identification AS Identificacion',
             'name AS Nombre',
             'surnames AS Apellidos',
-            'address AS Direccion',
-            'phone_number AS Telefono',
             'email AS Correo',
             'created_at AS Fecha'
         ])
-            ->orderBy('name', 'DSC')
+            ->orderBy('name', 'desc')
             ->get();
 
         return $users;
@@ -44,8 +42,6 @@ class UserController extends Controller
                 'identification' => 'required|numeric|unique:users,identification',
                 'name' => 'required|string',
                 'surnames' => 'required|string',
-                'address' => 'string',
-                'phone_number' => 'numeric',
                 'email' => 'string|unique:users,email',
             ]);
 
@@ -53,21 +49,33 @@ class UserController extends Controller
             $user->identification = $request->identification;
             $user->name = $request->name;
             $user->surnames = $request->surnames;
-            $user->address = $request->address;
-            $user->phone_number = $request->phone_number;
             $user->email = $request->email;
             $user->created_at = now();
             $user->save();
         } catch (\Throwable $e) {
-            report($e);
-            $error = $e->getMessage();
-            return $error;
+
+            return response()->json(
+                [
+                    'success' => false,
+                    'error' =>
+                    $e->getMessage()
+                ]
+                // , 400);
+                , 200);
+
+            // report($e);
+            // $error = $e->getMessage();
+            // return $error;
         }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Comprador registrado exitosamente',
-        ]);
+        return response()->json(
+            [
+                'success' => true,
+                'message' =>
+                'Comprador registrado exitosamente',
+            ],
+            200
+        );
     }
 
     /**
@@ -83,12 +91,10 @@ class UserController extends Controller
             'identification AS Identificacion',
             'name AS Nombre',
             'surnames AS Apellidos',
-            'address AS Direccion',
-            'phone_number AS Telefono',
             'email AS Correo',
             'created_at AS Fecha'
         ])
-            ->where('id', $id)
+            ->where('identification', $id)
             ->first();
 
         return $user;
@@ -108,8 +114,6 @@ class UserController extends Controller
                 'identification' => 'required|numeric|unique:users,identification,' . $id,
                 'name' => 'required|string',
                 'surnames' => 'required|string',
-                'address' => 'string',
-                'phone_number' => 'numeric',
                 'email' => 'string|unique:users,email,' . $id,
             ]);
 
@@ -119,8 +123,6 @@ class UserController extends Controller
                     'identification' => $request->identification,
                     'name' => $request->name,
                     'surnames' => $request->surnames,
-                    'address' => $request->address,
-                    'phone_number' => $request->phone_number,
                     'email' => $request->email,
                     'updated_at' => now()
                 ]);
@@ -146,5 +148,39 @@ class UserController extends Controller
     {
         $user = DB::table('users')->where('id', $id)->delete();
         return $user;
+    }
+
+
+    /**
+     * Esta funcion se encargar de filtrar al usuario por nombre
+     *
+     * @param Request $request
+     * @return void
+     */
+    public function searchUserByParameter(Request $request)
+    {
+        $data = $request->parameter;
+        if ($data) {
+            $user = DB::select(
+                "SELECT
+                        id AS Id,
+                        identification AS Identificacion,
+                        name AS Nombre,
+                        surnames AS Apellidos,
+
+                        email AS Correo,
+                        created_at AS Fecha
+                        FROM users
+                        WHERE name LIKE ?",
+                ['%' . $data . '%']
+            );
+            if(!$user){
+                return "No se encontraron datos relacionados";
+            }else{
+                return $user;
+            }
+        }else{
+            return "Debe ingresar un nombre";
+        }
     }
 }

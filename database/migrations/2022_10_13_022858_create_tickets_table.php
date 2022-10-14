@@ -15,8 +15,8 @@ return new class extends Migration
     {
         Schema::create('tickets', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('number')->unique();
-            $table->enum('state', ['Disponible', 'No disponible'])->default('Disponible');
+            $table->bigInteger('reference')->unique();
+            $table->enum('status', ['Disponible', 'No disponible'])->default('Disponible');
             $table->timestamps();
         });
     }
